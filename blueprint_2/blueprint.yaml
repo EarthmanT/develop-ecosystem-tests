@@ -1,0 +1,18 @@
+tosca_definitions_version: cloudify_dsl_1_3
+
+description: Develop blueprints.
+
+imports:
+  - https://cloudify.co/spec/cloudify/6.2.0/types.yaml
+
+node_templates:
+
+  acme_network:
+    type: cloudify.nodes.Network
+
+  acme_subnet:
+    type: cloudify.nodes.Subnet
+    relationships:
+      - target: acme_network
+        type: cloudify.relationships.contained_in
+
