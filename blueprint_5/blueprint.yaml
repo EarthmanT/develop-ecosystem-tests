@@ -1,0 +1,40 @@
+tosca_definitions_version: cloudify_dsl_1_3
+
+description: Develop blueprints.
+
+imports:
+  - https://cloudify.co/spec/cloudify/6.2.0/types.yaml
+
+node_templates:
+
+  acme_router:
+    type: cloudify.nodes.Router
+
+  acme_network:
+    type: cloudify.nodes.Network
+    relationships:
+      - target: acme_router
+        type: cloudify.relationships.connected_to
+
+  acme_subnet:
+    type: cloudify.nodes.Subnet
+    relationships:
+      - target: acme_network
+        type: cloudify.relationships.contained_in
+
+  acme_port:
+    type: cloudify.nodes.Port
+    relationships:
+      - target: acme_network
+        type: cloudify.relationships.contained_in
+
+  acme_virtual_device:
+    type: cloudify.nodes.Root
+    interfaces:
+      cloudify.interfaces.lifecycle:
+        create:
+          implementation: scripts/fixed.py
+          executor: central_deployment_agent
+    relationships:
+      - target: acme_port
+        type: cloudify.relationships.depends_on
