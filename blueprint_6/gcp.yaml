@@ -1,0 +1,45 @@
+tosca_definitions_version: cloudify_dsl_1_3
+
+description: >
+  This blueprint installs an application using Cloudify on GCP.
+
+imports:
+  - https://cloudify.co/spec/cloudify/6.2.0/types.yaml
+  - plugin:cloudify-gcp-plugin
+
+inputs:
+
+  region:
+    type: string
+    description: The GCP region to deploy the application in, such as europe-west1.
+    default: 'europe-west1'
+
+  zone:
+    type: string
+    description: The GCP zone to deploy the application in, such as europe-west1-b.
+    default: 'europe-west1-b'
+
+  network_name:
+    type: string
+    description: The name of your GCP Virtual Network.
+    default: iterate-net
+
+  network_auto_subnets:
+    type: boolean
+    description: Whether to automatically create subnets.
+    default: true
+
+dsl_definitions:
+
+  client_config: &gcp_config
+    auth: { get_secret: gcp_credentials }
+    zone: { get_input: zone }
+
+node_templates:
+
+  network:
+    type: cloudify.gcp.nodes.Network
+    properties:
+      name: { get_input: network_name }
+      gcp_config: *gcp_config
+      auto_subnets: { get_input: network_auto_subnets}
